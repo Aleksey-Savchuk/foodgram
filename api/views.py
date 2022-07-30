@@ -1,12 +1,19 @@
 from django.shortcuts import get_object_or_404
 
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.response import Response
 from .serializers import (FollowSerializers,
                           TagSerializers,
                           RecipeWriteSerializers,
                           RecipeReadSerializers,
-                          RecipeIngredientSerializers)
-from recipes.models import Tag, Recipe, RecipeIngredient
+                          RecipeIngredientSerializers,
+                          FavoriteSerializers,
+                          ShoppingCartSerializers)
+from recipes.models import (Tag,
+                            Recipe,
+                            RecipeIngredient,
+                            Favorite,
+                            ShoppingCart)
 from users.models import User
 from rest_framework.pagination import PageNumberPagination
 
@@ -32,18 +39,53 @@ class RecipeViewSet(ModelViewSet):
 # Список покупок
 class ShoppingCartViewSet(ModelViewSet):
     """."""
-    pass
+    serializer_class = ShoppingCartSerializers
+
+    def get_shopping_cart(self):
+        """FollowViewSet_get_follow."""
+        return get_object_or_404(
+            Recipe,
+            pk=self.kwargs.get('shopping_cart_id'),
+            )
+
+    def get_queryset(self):
+        """FollowViewSet_get_queryset."""
+        return self.get_shopping_cart().recipe_cart.all()
+
+    def perform_create(self, serializer):
+        """FollowViewSet_perform_create."""
+        return serializer.save(
+            user=self.request.user,
+            recipe_cart=self.get_shopping_cart())
 
 
 class DownloadShoppingCartViewSet(ModelViewSet):
     """."""
-    pass
+    queryset = Favorite.objects.all()
+    serializer_class = FavoriteSerializers
 
 
 # Избранное
 class FavoriteViewSet(ModelViewSet):
     """."""
-    pass 
+    serializer_class = FavoriteSerializers
+
+    def get_shopping_cart(self):
+        """FollowViewSet_get_follow."""
+        return get_object_or_404(
+            Recipe,
+            pk=self.kwargs.get('favorite_id'),
+            )
+
+    def get_queryset(self):
+        """FollowViewSet_get_queryset."""
+        return self.get_shopping_cart().recipe_cart.all()
+
+    def perform_create(self, serializer):
+        """FollowViewSet_perform_create."""
+        return serializer.save(
+            user=self.request.user,
+            favorite=self.get_shopping_cart())
 
 
 # Подписки

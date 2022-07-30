@@ -37,15 +37,16 @@ router.register(
     r'recipes/download_shopping_cart/',
     DownloadShoppingCartViewSet, basename='download_shopping_cart')
 router.register(
-    r'recipes/(?P<author_id>\d+)/shopping_cart',
+    r'recipes/(?P<shopping_cart_id>\d+)/shopping_cart',
     ShoppingCartViewSet, basename='shopping_cart')
 
 # Избранное
     # POST api/recipes/{id}/favorite/
     # DEL api/recipes/{id}/favorite/
 router.register(
-    r'users/(?P<author_id>\d+)/favorite',
+    r'recipes/(?P<favorite_id>\d+)/favorite',
     FavoriteViewSet, basename='favorite')
+
 
 # Подписки
     # GET api/users/subscriptions/
@@ -58,14 +59,6 @@ router.register(
 # Ингридиенты
     # GET api/ingredients/
     # GET api/ingredients/{id}/
-
-router.register(
-    r'recipes',
-    RecipeViewSet, basename='recipes')
-
-# router.register(
-#     r'shopping_cart',
-#     ShopCartViewSet, basename='shopping_cart')
 
 router.register(
     r'ingredients',
