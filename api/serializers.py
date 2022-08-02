@@ -177,3 +177,41 @@ class FollowSerializers(serializers.ModelSerializer):
 
 
 # Ингридиенты
+
+
+
+
+class EmailSerializer(serializers.ModelSerializer):
+
+    def validate(self, data):
+        if data['username'] == 'me':
+            raise serializers.ValidationError(
+                'Использовать имя "me" как юзернейм запрещено'
+            )
+        if User.objects.filter(username=data['username']).exists():
+            raise serializers.ValidationError(
+                'Юзернейм не уникален'
+            )
+        if User.objects.filter(email=data['email']).exists():
+            raise serializers.ValidationError(
+                'Email не уникален'
+            )
+        return data
+
+    class Meta:
+        fields = ('username', 'email')
+        model = User
+
+
+class TokenSerializer(serializers.Serializer):
+
+    confirmation_code = serializers.CharField(required=True)
+    username = serializers.CharField(required=True)
+
+
+class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = (
+            'username', 'email', 'first_name', 'last_name', 'bio', 'role')
+        model = User

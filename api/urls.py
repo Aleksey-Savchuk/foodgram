@@ -1,6 +1,7 @@
 """api_urls."""
 from django.urls import include, path
 from rest_framework import routers
+from users.views import send_auth_token, send_confirmation_code
 
 from .views import (FollowViewSet,
                     TagViewSet,
@@ -69,7 +70,8 @@ urlpatterns = [
     path('', include(router.urls)),
     # path('user/<int:pk>/', FollowViewSet.as_view())
     path('recipes/download_shopping_cart/25/',
-         DownloadShoppingCartViewSet.as_view())
-    # path('v1/auth/signup/', send_confirmation_code, name='singup'),
-    # path('v1/auth/token/', send_auth_token, name='token'),
+         DownloadShoppingCartViewSet.as_view()),
+
+    path('v1/auth/signup/', send_confirmation_code, name='singup'),
+    path('v1/auth/token/', send_auth_token, name='token'),
 ]

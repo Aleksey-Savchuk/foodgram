@@ -1,4 +1,5 @@
 from django.contrib import admin
+from users.models import User
 from recipes.models import (Tag,
                             Recipe,
                             Follow,
@@ -6,6 +7,17 @@ from recipes.models import (Tag,
                             RecipeIngredient,
                             ShoppingCart,
                             Favorite)
+
+
+
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    """."""
+    list_display = (
+        'id',
+        'username',
+    )
+    empty_value_display = '-пусто-'
 
 
 @admin.register(Tag)
