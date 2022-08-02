@@ -1,6 +1,10 @@
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-
+from django.db.models import Subquery, OuterRef, Sum, Q, Count, ExpressionWrapper
+from django.db.models import IntegerField
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.views import APIView
+from reportlab.pdfgen import canvas
 from rest_framework.response import Response
 from .serializers import (FollowSerializers,
                           TagSerializers,
@@ -13,7 +17,8 @@ from recipes.models import (Tag,
                             Recipe,
                             RecipeIngredient,
                             Favorite,
-                            ShoppingCart)
+                            ShoppingCart,
+                            Ingredient)
 from users.models import User
 from rest_framework.pagination import PageNumberPagination
 
@@ -59,10 +64,16 @@ class ShoppingCartViewSet(ModelViewSet):
             recipe_cart=self.get_shopping_cart())
 
 
-class DownloadShoppingCartViewSet(ModelViewSet):
+class DownloadShoppingCartViewSet(APIView):
     """."""
-    queryset = Favorite.objects.all()
-    serializer_class = FavoriteSerializers
+    def get(self, request):
+        sq = ShoppingCart.objects.filter(user=self.request.user).values_list('recipe_cart_id') 
+        q_sq = Q(igredients_recipes__recipe__in=sq)
+        ing = Ingredient.objects.annotate(
+            sum=Sum('igredients_recipes__amount',
+                    output_field=IntegerField(),
+                    filter=q_sq)).filter(sum__gt=0).values()
+        return HttpResponse(ing)
 
 
 # Избранное

@@ -33,9 +33,9 @@ router.register(
     # GET api/recipes/download_shopping_cart/
     # POST api/recipes/{id}/shopping_cart/
     # DEL api/recipes/{id}/shopping_cart/
-router.register(
-    r'recipes/download_shopping_cart/',
-    DownloadShoppingCartViewSet, basename='download_shopping_cart')
+# router.register(
+#     r'recipes/download_shopping_cart/',
+#     DownloadShoppingCartViewSet, basename='download_shopping_cart')
 router.register(
     r'recipes/(?P<shopping_cart_id>\d+)/shopping_cart',
     ShoppingCartViewSet, basename='shopping_cart')
@@ -68,6 +68,8 @@ router.register(
 urlpatterns = [
     path('', include(router.urls)),
     # path('user/<int:pk>/', FollowViewSet.as_view())
+    path('recipes/download_shopping_cart/25/',
+         DownloadShoppingCartViewSet.as_view())
     # path('v1/auth/signup/', send_confirmation_code, name='singup'),
     # path('v1/auth/token/', send_auth_token, name='token'),
 ]

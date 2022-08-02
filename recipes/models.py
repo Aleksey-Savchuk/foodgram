@@ -72,12 +72,12 @@ class Recipe(models.Model):
         verbose_name='Время приготовления',
         help_text='Укажите время приготовления в минутах'
     )
-    # ingredients = models.ManyToManyField(
-    #     'Ingredient',
-    #     through='RecipeIngredient',
-    #     related_name='recipes_ingredients',
-    #     verbose_name='Ингредиенты'
-    # )
+    ingredients = models.ManyToManyField(
+        'Ingredient',
+        through='RecipeIngredient',
+        related_name='recipes_ingredients',
+        verbose_name='Ингредиенты'
+    )
 
     class Meta:
         verbose_name = 'Рецепт'
