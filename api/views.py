@@ -5,6 +5,9 @@ from django.db.models import IntegerField
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 from rest_framework.response import Response
 from .serializers import (FollowSerializers,
                           TagSerializers,
@@ -67,13 +70,39 @@ class ShoppingCartViewSet(ModelViewSet):
 class DownloadShoppingCartViewSet(APIView):
     """."""
     def get(self, request):
-        sq = ShoppingCart.objects.filter(user=self.request.user).values_list('recipe_cart_id') 
+        sq_use = Q(user=self.request.user)
+        sq = ShoppingCart.objects.filter(sq_use).values_list('recipe_cart_id')
         q_sq = Q(igredients_recipes__recipe__in=sq)
         ing = Ingredient.objects.annotate(
             sum=Sum('igredients_recipes__amount',
                     output_field=IntegerField(),
-                    filter=q_sq)).filter(sum__gt=0).values()
-        return HttpResponse(ing)
+                    filter=q_sq)).filter(sum__gt=0).values('name',
+                                                           'measurement_unit',
+                                                           'sum')
+
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="file.pdf"'
+        p = canvas.Canvas(response)
+        pdfmetrics.registerFont(TTFont('DejaVuSerif',
+                                       'DejaVuSerif.ttf',
+                                       'UTF-8'))
+        p.setFont("DejaVuSerif", 18)
+        p.drawString(25, 800, "№ пп")
+        p.drawString(125, 800, "Наименование")
+        p.drawString(400, 800, "ед. из.")
+        p.drawString(525, 800, "Кол-во")
+        n = 1
+        p_str = 775
+        for k in ing:
+            p.drawString(25, p_str, str(n))
+            p.drawString(125, p_str, str(k['name']))
+            p.drawString(400, p_str, str(k['measurement_unit']))
+            p.drawString(525, p_str, str(k['sum']))
+            n += 1
+            p_str -= 25
+        p.showPage()
+        p.save()
+        return response
 
 
 # Избранное
