@@ -93,7 +93,7 @@ class ShoppingCart(models.Model):
     """Модель подписки"""
     user = models.ForeignKey(
         User,
-        verbose_name='Подписчик',
+        verbose_name='Пользователь',
         on_delete=models.CASCADE,
         related_name='user'
     )
